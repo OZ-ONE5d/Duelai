@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>遊戯王 展開判断プロトタイプ</title>
+<style>
+body{
+font-family:sans-serif;
+max-width:800px;
+margin:40px auto;
+line-height:1.8;
+}
+.box{
+border:1px solid #ccc;
+padding:20px;
+margin-top:20px;
+}
+button{
+padding:10px 20px;
+font-size:16px;
+}
+.result{
+margin-top:20px;
+font-weight:bold;
+}
+</style>
+</head>
+<body>
+
+<h1>誘発ケア付き展開判断モデル（試作）</h1>
+
+<h2>初手（仮）</h2>
+
+<label>
+<input type="checkbox" id="starterA">
+初動A（例: Lotus）
+</label><br>
+
+<label>
+<input type="checkbox" id="starterB">
+初動B（例: Throne）
+</label><br>
+
+<label>
+<input type="checkbox" id="starterC">
+初動C（例: その他）
+</label>
+
+<h2>想定する相手妨害</h2>
+
+<label>
+<input type="checkbox" id="ash" checked>
+うらら
+</label><br>
+
+<label>
+<input type="checkbox" id="nibiru" checked>
+ニビル
+</label><br>
+
+<label>
+<input type="checkbox" id="droll" checked>
+ドロバ
+</label>
+
+<br><br>
+
+<button onclick="decidePlay()">
+最適展開を判断
+</button>
+
+<div class="box result" id="output">
+結果がここに表示されます
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>

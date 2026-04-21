@@ -1,86 +1,131 @@
-function decidePlay(){
+function simulate(){
 
-const hand = {
-starterA: document.getElementById("starterA").checked,
-starterB: document.getElementById("starterB").checked,
-starterC: document.getElementById("starterC").checked
-};
+const lotus =
+document.getElementById("lotus").checked;
 
-const interrupts = {
-ash: document.getElementById("ash").checked,
-nibiru: document.getElementById("nibiru").checked,
-droll: document.getElementById("droll").checked
-};
+const spirit =
+document.getElementById("spirit").checked;
 
-let route = "";
-let guarantee = "";
-let reason = "";
+const throne =
+document.getElementById("throne").checked;
+
+const ashTarget =
+document.getElementById("ashTarget").value;
+
+let log = "";
 
 
-// ---- 仮ルールベース ----
+// 初手確認
 
-// 最強初手
-if(hand.starterA && hand.starterB){
+if(!lotus && !throne){
 
-if(interrupts.ash){
+log += "初動不足\n";
+log += "展開不可\n";
 
-route = "ケアルート2";
+document.getElementById("output").innerText = log;
+return;
 
-guarantee = "最低保証盤面 到達";
+}
 
-reason =
-"うららケア優先。" +
-"展開継続を重視し、最大展開ではなく安全ルート選択。";
+
+// 基本展開
+
+log += "基本展開:\n";
+
+if(lotus){
+
+log +=
+"1. Samsara D Lotus使用\n";
+
+}
+
+if(throne){
+
+log +=
+"2. Nightmare Throne使用\n";
+
+}
+
+log +=
+"3. Spirit of Yubel展開\n";
+
+log +=
+"4. Nightmare Painへ接続\n\n";
+
+
+// 被弾判定
+
+if(ashTarget==="none"){
+
+log +=
+"うららなし\n";
+
+log +=
+"最大展開ルート\n";
+
+log +=
+"最低保証盤面: 達成\n";
+
+}
+
+
+else if(ashTarget==="lotus"){
+
+log +=
+"Dロータスにうらら被弾\n";
+
+if(throne){
+
+log +=
+"代替ルートへ分岐\n";
+
+log +=
+"Nightmare Throne経由で継続\n";
+
+log +=
+"最低保証盤面: 達成\n";
 
 }
 else{
 
-route = "最大展開ルート";
+log +=
+"継続不可\n";
 
-guarantee = "高盤面";
-
-reason =
-"主要妨害が薄いため最大展開。";
-
-}
+log +=
+"最低保証盤面: 未達\n";
 
 }
-
-
-// 初動1枚のみ
-else if(hand.starterA || hand.starterB){
-
-route = "ケアルート1";
-
-guarantee = "最低保証盤面 到達";
-
-reason =
-"初動が弱いため継続優先。";
 
 }
 
 
-// 初動不足
+else if(ashTarget==="throne"){
+
+log +=
+"Nightmare Throneにうらら被弾\n";
+
+if(lotus){
+
+log +=
+"Dロータス経由で継続\n";
+
+log +=
+"最低保証盤面: 達成\n";
+
+}
 else{
 
-route = "展開不可";
+log +=
+"継続不可\n";
 
-guarantee = "最低保証盤面 未達";
+log +=
+"最低保証盤面: 未達\n";
 
-reason =
-"初動不足。";
+}
 
 }
 
 
-document.getElementById("output").innerHTML =
-
-`
-推奨展開: ${route}<br><br>
-
-結果: ${guarantee}<br><br>
-
-理由: ${reason}
-`;
+document.getElementById("output").innerText = log;
 
 }

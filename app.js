@@ -52,7 +52,7 @@ function evaluateHand() {
     return;
   }
 
-  const route = generateRoute(hand, enemy);
+  const route = generateRoute([...hand], [...enemy]);
   const score = evaluateState(hand, enemy);
 
   result.textContent =
@@ -63,93 +63,125 @@ function evaluateHand() {
   document.getElementById("route").textContent = route;
 }
 
+// ===== 抹殺処理 =====
+function useCrossout(hand, enemy, target) {
+  if (hand.includes("抹殺の指名者") && enemy.includes(target)) {
+    hand.splice(hand.indexOf("抹殺の指名者"), 1);
+    enemy.splice(enemy.indexOf(target), 1);
+    return true;
+  }
+  return false;
+}
+
 // ===== 展開 =====
 function generateRoute(hand, enemy) {
 
   let log = "【展開開始】\n";
 
   let monsters = [];
-  let field = [];
   let grave = [];
+  let hasPain = hand.includes("ナイトメアペイン");
 
-  const hasPain = hand.includes("ナイトメアペイン");
-
-  // スローン
+  // ===== スローン =====
   if (hand.includes("ナイトメアスローン")) {
-    log += "① スローン → Dロータスサーチ\n";
-    if (!hand.includes("Dロータス")) hand.push("Dロータス");
+
+    if (enemy.includes("うらら") && !useCrossout(hand, enemy, "うらら")) {
+      log += "① スローン → うららで無効\n";
+    } else {
+      log += "① スローン → Dロータスサーチ\n";
+      if (!hand.includes("Dロータス")) hand.push("Dロータス");
+    }
   }
 
-  // 解門
+  // ===== 解門 =====
   if (hand.includes("七精の解門")) {
     log += "② 解門発動\n";
-    log += "　墓地魔法回収 + 手札1枚捨て\n";
-    log += "　Dロータス特殊召喚\n";
+    log += "　手札1枚捨て → Dロータス特殊召喚\n";
     monsters.push("Dロータス");
   }
 
-  // 通常召喚
+  // ===== 通常召喚 =====
   if (hand.includes("Dロータス") && !monsters.includes("Dロータス")) {
     log += "③ Dロータス通常召喚\n";
     monsters.push("Dロータス");
   }
 
-  // うらら
-  if (enemy.includes("うらら")) {
-    log += "→ うらら：効果無効\n";
-  } else {
-    log += "④ Dロータス → スピリット特殊召喚\n";
-    monsters.push("スピリット");
+  // ===== ロータス効果 =====
+  if (monsters.includes("Dロータス")) {
+
+    if (enemy.includes("うらら") && !useCrossout(hand, enemy, "うらら")) {
+      log += "④ Dロータス効果 → うららで無効\n";
+    } else {
+      log += "④ Dロータス → スピリット特殊召喚\n";
+      monsters.push("スピリット");
+    }
   }
 
-  // 泡影
-  if (enemy.includes("泡影") && !hasPain) {
+  // ===== 泡影 =====
+  let spiritNegated = false;
+  if (enemy.includes("泡影") && !hasPain && monsters.includes("スピリット")) {
     log += "→ 泡影：スピリット無効\n";
+    spiritNegated = true;
   }
 
-  // サーチ
-  if (!hasPain) {
-    log += "⑤ スピリット → ナイトメアペインサーチ\n";
-    hand.push("ナイトメアペイン");
-  } else {
-    log += "⑤ ナイトメアペインあり → Eternal Favoriteサーチ\n";
-    if (!hand.includes("Eternal Favorite")) hand.push("Eternal Favorite");
+  // ===== スピリット効果 =====
+  if (monsters.includes("スピリット") && !spiritNegated) {
+
+    if (enemy.includes("うらら") && !useCrossout(hand, enemy, "うらら")) {
+      log += "⑤ スピリット効果 → うららで無効\n";
+    } else {
+      if (!hasPain) {
+        log += "⑤ スピリット → ナイトメアペインサーチ\n";
+        hand.push("ナイトメアペイン");
+        hasPain = true;
+      } else {
+        log += "⑤ ペインあり → Eternal Favoriteサーチ\n";
+        hand.push("Eternal Favorite");
+      }
+    }
   }
 
-  // ペイン
-  log += "⑥ ナイトメアペイン発動\n";
+  // ===== ペイン =====
+  if (hasPain) {
+    log += "⑥ ナイトメアペイン発動\n";
 
-  // ペイン効果
-  log += "⑦ ペイン破壊効果発動\n";
-  if (!hand.includes("Eternal Favorite")) {
-    log += "　→ Eternal Favoriteサーチ\n";
-    hand.push("Eternal Favorite");
+    log += "⑦ ペイン効果（破壊）発動\n";
+
+    if (!hand.includes("Eternal Favorite")) {
+      log += "　→ Eternal Favoriteサーチ\n";
+      hand.push("Eternal Favorite");
+    }
   }
 
-  // ユベル展開
-  log += "⑧ スピリット破壊 → ユベル特殊召喚\n";
-  monsters.push("ユベル");
+  // ===== ユベル展開 =====
+  if (monsters.includes("スピリット")) {
+    log += "⑧ スピリット破壊 → ユベル特殊召喚\n";
+    monsters = monsters.filter(m => m !== "スピリット");
+    monsters.push("ユベル");
+  }
 
-  log += "⑨ ユベル破壊 → ユベル特殊召喚\n";
+  // ★ 修正：勝手に破壊しない
+  // （ここでユベルはそのまま残る）
 
-  // ニビル
+  // ===== ニビル =====
   if (enemy.includes("ニビル")) {
     log += "→ ニビル：盤面リセット\n";
     monsters = ["トークン"];
   }
 
-  // エンド
+  // ===== エンド =====
   log += "\n【エンドフェイズ】\n";
 
   if (monsters.includes("ユベル")) {
-    log += "ユベル効果 → モンスター1体リリース\n";
+    log += "ユベル → モンスター1体リリース\n";
   }
 
   log += "墓地からDロータス特殊召喚\n";
   monsters.push("Dロータス");
 
-  // 最終盤面
+  // ===== 最終盤面 =====
   log += "\n【最終盤面】\n";
+  log += "モンスター数：" + monsters.length + "\n";
   log += "モンスター：" + monsters.join(", ") + "\n";
   log += "魔法：ナイトメアペイン\n";
 
@@ -165,7 +197,7 @@ function evaluateState(hand, enemy) {
   let expand = 80;
   let disrupt = 0;
 
-  if (enemy.includes("うらら")) expand -= 30;
+  if (enemy.includes("うらら")) expand -= 25;
   if (enemy.includes("泡影")) expand -= 20;
   if (enemy.includes("ドロバ")) expand -= 15;
   if (enemy.includes("ニビル")) expand -= 50;

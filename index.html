@@ -2,13 +2,13 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ユベルAI（確率＋誘発分岐）</title>
+<title>ユベルAI（詳細展開＋確率）</title>
 </head>
 <body>
 
-<h2>ユベル 初動AI（確率＋最適ルート）</h2>
+<h2>ユベル 初動AI（詳細展開ルート付き）</h2>
 
-<p>手札5枚を選択：</p>
+<p>手札を選択（最大5枚・その他ありなら少なくてもOK）</p>
 <div id="cards"></div>
 
 <button onclick="evaluateHand()">評価する</button>
@@ -16,7 +16,7 @@
 <h3>評価</h3>
 <pre id="result"></pre>
 
-<h3>最適ルート</h3>
+<h3>展開ルート</h3>
 <pre id="route"></pre>
 
 <script src="app.js"></script>

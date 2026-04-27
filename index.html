@@ -2,26 +2,59 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ユベルAI（複数誘発対応）</title>
+<title>ユベルAI（対誘発シミュレーター）</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+h2 {
+  margin-bottom: 10px;
+}
+.section {
+  margin-bottom: 20px;
+}
+label {
+  display: block;
+}
+button {
+  margin-top: 10px;
+  padding: 5px 10px;
+}
+pre {
+  background: #f4f4f4;
+  padding: 10px;
+  white-space: pre-wrap;
+}
+</style>
 </head>
 <body>
 
-<h2>ユベルAI（複数誘発＋詳細展開）</h2>
+<h2>ユベルAI（対誘発シミュレーター）</h2>
 
-<p>自分の手札</p>
-<div id="cards"></div>
+<div class="section">
+  <h3>自分の手札</h3>
+  <div id="cards"></div>
+</div>
 
-<p>相手の誘発（複数選択可）</p>
-<div id="enemy"></div>
+<div class="section">
+  <h3>相手の誘発（複数選択可）</h3>
+  <div id="enemy"></div>
+</div>
 
 <button onclick="evaluateHand()">評価する</button>
 
-<h3>評価</h3>
-<pre id="result"></pre>
+<div class="section">
+  <h3>評価</h3>
+  <pre id="result">ここに結果が表示されます</pre>
+</div>
 
-<h3>展開ルート</h3>
-<pre id="route"></pre>
+<div class="section">
+  <h3>展開ルート</h3>
+  <pre id="route">ここに展開ログが表示されます</pre>
+</div>
 
 <script src="app.js"></script>
+
 </body>
 </html>

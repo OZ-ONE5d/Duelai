@@ -2,68 +2,23 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ユベル展開シミュレーション</title>
-<style>
-body{
-font-family:sans-serif;
-max-width:900px;
-margin:40px auto;
-line-height:1.8;
-}
-.box{
-border:1px solid #ccc;
-padding:20px;
-margin-top:20px;
-}
-button{
-padding:12px 20px;
-font-size:16px;
-}
-#output{
-white-space:pre-line;
-}
-</style>
+<title>ユベルAI（確率＋誘発分岐）</title>
 </head>
 <body>
 
-<h1>ユベル展開シミュレーター（研究用試作）</h1>
+<h2>ユベル 初動AI（確率＋最適ルート）</h2>
 
-<h2>初手</h2>
+<p>手札5枚を選択：</p>
+<div id="cards"></div>
 
-<label>
-<input type="checkbox" id="lotus" checked>
-Samsara D Lotus
-</label><br>
+<button onclick="evaluateHand()">評価する</button>
 
-<label>
-<input type="checkbox" id="spirit">
-Spirit of Yubel
-</label><br>
+<h3>評価</h3>
+<pre id="result"></pre>
 
-<label>
-<input type="checkbox" id="throne" checked>
-Nightmare Throne
-</label>
-
-<h2>相手はどこでうららを撃つ？</h2>
-
-<select id="ashTarget">
-<option value="none">撃たれない</option>
-<option value="lotus">Dロータスにうらら</option>
-<option value="throne">ナイトメアスローンにうらら</option>
-</select>
-
-<br><br>
-
-<button onclick="simulate()">
-展開シミュレーション
-</button>
-
-<div class="box" id="output">
-結果がここに表示されます
-</div>
+<h3>最適ルート</h3>
+<pre id="route"></pre>
 
 <script src="app.js"></script>
-
 </body>
 </html>

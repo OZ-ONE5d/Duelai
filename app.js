@@ -1,131 +1,159 @@
-function simulate(){
+const cardList = [
+  "Dロータス",
+  "ナイトメアスローン",
+  "七精の解門",
+  "ナイトメアペイン",
+  "抹殺の指名者",
+  "超融合",
+  "Eternal Favorite",
+  "ファントムオブユベル",
+  "その他"
+];
 
-const lotus =
-document.getElementById("lotus").checked;
+const PROB = {
+  ash: 0.22,
+  imperm: 0.22,
+  droll: 0.12,
+  nibiru: 0.12,
+  none: 0.32
+};
 
-const spirit =
-document.getElementById("spirit").checked;
+// UI生成
+const container = document.getElementById("cards");
 
-const throne =
-document.getElementById("throne").checked;
+cardList.forEach(card => {
+  const label = document.createElement("label");
+  const checkbox = document.createElement("input");
 
-const ashTarget =
-document.getElementById("ashTarget").value;
+  checkbox.type = "checkbox";
+  checkbox.value = card;
 
-let log = "";
+  label.appendChild(checkbox);
+  label.appendChild(document.createTextNode(card));
+  container.appendChild(label);
+  container.appendChild(document.createElement("br"));
+});
 
+// メイン
+function evaluateHand() {
+  const checked = Array.from(document.querySelectorAll("input:checked"))
+    .map(el => el.value);
 
-// 初手確認
+  if (checked.length !== 5) {
+    result.textContent = "5枚選んでください";
+    route.textContent = "";
+    return;
+  }
 
-if(!lotus && !throne){
+  const routes = generateRoutes(checked);
 
-log += "初動不足\n";
-log += "展開不可\n";
+  let best = null;
+  let bestScore = -1;
 
-document.getElementById("output").innerText = log;
-return;
+  routes.forEach(r => {
+    const expected = evaluateExpected(r, checked);
 
+    if (expected.total > bestScore) {
+      bestScore = expected.total;
+      best = { route: r, ...expected };
+    }
+  });
+
+  result.textContent =
+    "展開(期待値): " + Math.round(best.expand) + "\n" +
+    "妨害: " + Math.round(best.disrupt) + "\n" +
+    "総合: " + best.total;
+
+  route.textContent = best.route;
 }
 
+// ルート生成
+function generateRoutes(hand) {
+  let routes = [];
 
-// 基本展開
+  const hasLotus = hand.includes("Dロータス");
+  const hasThrone = hand.includes("ナイトメアスローン");
+  const hasGate = hand.includes("七精の解門");
 
-log += "基本展開:\n";
+  if (hasLotus) {
+    routes.push("【安全ルート】\nDロータス温存展開");
+    routes.push("【最速ルート】\nDロータス即効果");
+  }
 
-if(lotus){
+  if (hasThrone) {
+    routes.push("【スローンルート】\nスローン→ロータス");
+  }
 
-log +=
-"1. Samsara D Lotus使用\n";
+  if (hasGate) {
+    routes.push("【解門ルート】\n解門→展開");
+  }
 
+  if (routes.length === 0) {
+    routes.push("初動不可");
+  }
+
+  return routes;
 }
 
-if(throne){
+// 期待値計算
+function evaluateExpected(route, hand) {
+  let totalExpand = 0;
+  let totalDisrupt = 0;
 
-log +=
-"2. Nightmare Throne使用\n";
+  for (let key in PROB) {
+    const prob = PROB[key];
+    const state = evaluateStateWithCare(route, hand, key);
 
+    totalExpand += state.expand * prob;
+    totalDisrupt += state.disrupt * prob;
+  }
+
+  const total = Math.round(totalExpand * 0.6 + totalDisrupt * 0.4);
+
+  return { expand: totalExpand, disrupt: totalDisrupt, total };
 }
 
-log +=
-"3. Spirit of Yubel展開\n";
+// ケア処理
+function evaluateStateWithCare(route, hand, interruption) {
+  const hasCrossout = hand.includes("抹殺の指名者");
+  const hasPain = hand.includes("ナイトメアペイン");
 
-log +=
-"4. Nightmare Painへ接続\n\n";
+  if (interruption === "ash" && hasCrossout) interruption = "none";
+  if (interruption === "imperm" && hasPain) interruption = "none";
 
-
-// 被弾判定
-
-if(ashTarget==="none"){
-
-log +=
-"うららなし\n";
-
-log +=
-"最大展開ルート\n";
-
-log +=
-"最低保証盤面: 達成\n";
-
+  return evaluateState(route, hand, interruption);
 }
 
+// 状態評価
+function evaluateState(route, hand, interruption) {
+  let expand = 0;
+  let disrupt = 0;
 
-else if(ashTarget==="lotus"){
+  const hasLotus = hand.includes("Dロータス");
+  const hasPain = hand.includes("ナイトメアペイン");
 
-log +=
-"Dロータスにうらら被弾\n";
+  // 展開
+  if (hasLotus) expand += 35;
+  if (hasPain) expand += 20;
 
-if(throne){
+  if (route.includes("安全")) expand += 20;
+  else expand += 10;
 
-log +=
-"代替ルートへ分岐\n";
+  if (hasLotus && hasPain) expand += 20;
 
-log +=
-"Nightmare Throne経由で継続\n";
+  // 誘発影響
+  if (interruption === "ash") expand -= 25;
+  if (interruption === "imperm") expand -= 20;
+  if (interruption === "droll") expand -= 15;
+  if (interruption === "nibiru") expand -= 30;
 
-log +=
-"最低保証盤面: 達成\n";
+  // 妨害
+  if (hand.includes("超融合")) disrupt += 40;
+  if (hand.includes("Eternal Favorite")) disrupt += 30;
+  if (hand.includes("ファントムオブユベル")) disrupt += 30;
 
-}
-else{
+  expand = Math.max(0, Math.min(100, expand));
+  disrupt = Math.min(100, disrupt);
 
-log +=
-"継続不可\n";
-
-log +=
-"最低保証盤面: 未達\n";
-
-}
-
-}
-
-
-else if(ashTarget==="throne"){
-
-log +=
-"Nightmare Throneにうらら被弾\n";
-
-if(lotus){
-
-log +=
-"Dロータス経由で継続\n";
-
-log +=
-"最低保証盤面: 達成\n";
-
-}
-else{
-
-log +=
-"継続不可\n";
-
-log +=
-"最低保証盤面: 未達\n";
-
-}
-
-}
-
-
-document.getElementById("output").innerText = log;
-
+  return { expand, disrupt };
 }

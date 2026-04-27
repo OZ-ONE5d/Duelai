@@ -2,14 +2,17 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ユベルAI（詳細展開＋確率）</title>
+<title>ユベルAI（対誘発＋詳細展開）</title>
 </head>
 <body>
 
-<h2>ユベル 初動AI（詳細展開ルート付き）</h2>
+<h2>ユベルAI（対誘発＋最終盤面）</h2>
 
-<p>手札を選択（最大5枚・その他ありなら少なくてもOK）</p>
+<p>自分の手札</p>
 <div id="cards"></div>
+
+<p>相手の誘発（想定）</p>
+<div id="enemy"></div>
 
 <button onclick="evaluateHand()">評価する</button>
 

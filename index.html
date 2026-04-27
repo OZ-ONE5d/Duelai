@@ -2,31 +2,40 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ユベルAI（対誘発シミュレーター）</title>
+<title>ユベルAI（最終版）</title>
+
 <style>
 body {
   font-family: Arial, sans-serif;
   margin: 20px;
 }
+
 h2 {
   margin-bottom: 10px;
 }
+
 .section {
   margin-bottom: 20px;
 }
+
 label {
   display: block;
+  margin: 3px 0;
 }
+
 button {
-  margin-top: 10px;
-  padding: 5px 10px;
+  padding: 6px 12px;
+  font-size: 14px;
 }
+
 pre {
   background: #f4f4f4;
   padding: 10px;
   white-space: pre-wrap;
+  border: 1px solid #ccc;
 }
 </style>
+
 </head>
 <body>
 
@@ -38,7 +47,7 @@ pre {
 </div>
 
 <div class="section">
-  <h3>相手の誘発（複数選択可）</h3>
+  <h3>相手の手札誘発（複数選択）</h3>
   <div id="enemy"></div>
 </div>
 
@@ -46,12 +55,12 @@ pre {
 
 <div class="section">
   <h3>評価</h3>
-  <pre id="result">ここに結果が表示されます</pre>
+  <pre id="result">ここに評価が表示されます</pre>
 </div>
 
 <div class="section">
-  <h3>展開ルート</h3>
-  <pre id="route">ここに展開ログが表示されます</pre>
+  <h3>展開ログ</h3>
+  <pre id="route">ここに展開ルートが表示されます</pre>
 </div>
 
 <script src="app.js"></script>
